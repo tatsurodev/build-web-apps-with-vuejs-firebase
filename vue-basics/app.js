@@ -5,9 +5,5 @@ new Vue({
         name: 'Ryu',
     },
     methods: {
-        updateName(e) {
-            // console.log(e.target.value)
-            this.name = e.target.value
-        }
     },
 })

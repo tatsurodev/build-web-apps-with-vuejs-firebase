@@ -7,25 +7,17 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Vue Basic</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <style>
-        .one {
-            color: green;
-        }
-
-        .two {
-            text-decoration: line-through;
-        }
-    </style>
 </head>
 
 <body>
     <h1>Vue Basics</h1>
     <div id="app">
         <h2>{{ title }}</h2>
-        <p>{{ greet('morning') }}</p>
-        <a :href="url">Youtube</a>
-        <div :class="classes">Classes From Instance</div>
-        <input type="text" :value="name">
+        <p>earn {{ wage }} pounds per hour</p>
+        <button v-on:click="changeWage(1)">Incrase wage by 1 pound</button>
+        <button v-on:click="changeWage(-1)">Decrease wage by 1 pound</button>
+        <button v-on:dblclick="changeWage(5)">Incrase wage by 5 pounds</button>
+        <button v-on:dblclick="changeWage(-5)">Decrease wage by 5 pounds</button>
     </div>
     <script src="app.js"></script>
 </body>

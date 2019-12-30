@@ -8,6 +8,14 @@
         <router-link :to="{ name: 'About' }">About</router-link>
       </li>
     </ul>
+    <h2>User Profiles</h2>
+    <ul>
+      <li v-for="(id, index) in userIds" :key="index">
+        <router-link :to="{ name: 'Profile', params: { user_id: id } }">
+          <span>Profile {{ id }}</span>
+        </router-link>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -15,7 +23,9 @@
 export default {
   name: 'Navbar',
   data() {
-    return {}
+    return {
+      userIds: ['1', '2', '3', '4']
+    }
   }
 }
 </script>

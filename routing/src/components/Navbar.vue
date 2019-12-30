@@ -65,4 +65,7 @@ li {
   display: inline-block;
   margin: 10px;
 }
+.router-link-exact-active {
+  color: purple;
+}
 </style>

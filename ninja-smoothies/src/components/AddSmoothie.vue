@@ -24,6 +24,9 @@
 </template>
 
 <script>
+import db from '@/firebase/init'
+import slugify from 'slugify'
+
 export default {
   name: 'AddSmoothie',
   data() {
@@ -31,12 +34,38 @@ export default {
       title: null,
       another: null,
       ingredients: [],
-      feedback: null
+      feedback: null,
+      slug: null
     }
   },
   methods: {
     AddSmoothie() {
-      console.log(this.title, this.ingredients)
+      if (this.title) {
+        this.feedback = null
+        // create a slug
+        this.slug = slugify(this.title, {
+          // スペースを置き換える文字
+          replacement: '-',
+          // 正規表現でマッチする文字列を削除
+          remove: /[$*_+~.()'"!\-:@]/g,
+          // 小文字のみ
+          lower: true
+        })
+        db.collection('smoothies')
+          .add({
+            title: this.title,
+            ingredients: this.ingredients,
+            slug: this.slug
+          })
+          .then(() => {
+            this.$router.push({ name: 'Index' })
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      } else {
+        this.feedback = 'You must enter a smoothie title'
+      }
     },
     addIng() {
       if (this.another) {

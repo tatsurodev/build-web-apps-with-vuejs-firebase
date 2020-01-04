@@ -26,10 +26,17 @@ export default {
   },
   methods: {
     deleteSmoothie(id) {
-      this.smoothies = this.smoothies.filter(smoothie => {
-        // return trueでそのまま残る、return falseで取り除かれる
-        return smoothie.id !== id
-      })
+      // delete data from firebase
+      db.collection('smoothies')
+        .doc(id)
+        .delete()
+        .then(() => {
+          // delete data from frontend
+          this.smoothies = this.smoothies.filter(smoothie => {
+            // return trueでそのまま残る、return falseで取り除かれる
+            return smoothie.id !== id
+          })
+        })
     }
   },
   created() {

@@ -26,6 +26,7 @@
 
 <script>
 import db from '@/firebase/init'
+import slugify from 'slugify'
 
 export default {
   name: 'EditSmoothie',
@@ -38,7 +39,33 @@ export default {
   },
   methods: {
     EditSmoothie() {
-      console.log(this.smoothie.title, this.smoothie.ingredients)
+      if (this.smoothie.title) {
+        this.feedback = null
+        // create a slug
+        this.smoothie.slug = slugify(this.smoothie.title, {
+          // スペースを置き換える文字
+          replacement: '-',
+          // 正規表現でマッチする文字列を削除
+          remove: /[$*_+~.()'"!\-:@]/g,
+          // 小文字のみ
+          lower: true
+        })
+        db.collection('smoothies')
+          .doc(this.smoothie.id)
+          .update({
+            title: this.smoothie.title,
+            ingredients: this.smoothie.ingredients,
+            slug: this.smoothie.slug
+          })
+          .then(() => {
+            this.$router.push({ name: 'Index' })
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      } else {
+        this.feedback = 'You must enter a smoothie title'
+      }
     },
     addIng() {
       if (this.another) {

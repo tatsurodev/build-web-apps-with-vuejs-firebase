@@ -4,10 +4,10 @@
     <div class="card">
       <div class="card-content">
         <ul class="messages">
-          <li>
-            <span class="teal-text">Name</span>
-            <span class="grey-text text-darken-3">Message</span>
-            <span class="grey-text time">Time</span>
+          <li v-for="message in messages" :key="message.id">
+            <span class="teal-text">{{ message.name }}</span>
+            <span class="grey-text text-darken-3">{{ message.content }}</span>
+            <span class="grey-text time">{{ message.timestamp }}</span>
           </li>
         </ul>
       </div>
@@ -20,6 +20,7 @@
 
 <script>
 import NewMessage from '@/components/NewMessage'
+import db from '@/firebase/init'
 
 export default {
   name: 'Chat',
@@ -28,7 +29,29 @@ export default {
     NewMessage
   },
   data() {
-    return {}
+    return {
+      messages: []
+    }
+  },
+  created() {
+    // collectionへのreferenceを並び替えて取得
+    let ref = db.collection('messages').orderBy('timestamp')
+    // collectionに対してlistenerを設定、snapshotが返ってくる
+    ref.onSnapshot(snapshot => {
+      // snapshotに対して変化のあった差分のみ取得
+      snapshot.docChanges().forEach(change => {
+        // 各documentのtypeがaddedだった場合
+        if (change.type == 'added') {
+          let doc = change.doc
+          this.messages.push({
+            id: doc.id,
+            name: doc.data().name,
+            content: doc.data().content,
+            timestamp: doc.data().timestamp
+          })
+        }
+      })
+    })
   }
 }
 </script>

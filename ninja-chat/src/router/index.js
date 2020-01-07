@@ -16,7 +16,16 @@ export default new Router({
             path: '/chat',
             name: 'Chat',
             component: Chat,
-            props: true
+            props: true,
+            beforeEnter: (to, from, next) => {
+                // name propsがある場合のみnext    
+                if (to.params.name) {
+                    next()
+                } else {
+                    next({ name: 'Welcome' })
+                }
+
+            }
         }
     ]
 })

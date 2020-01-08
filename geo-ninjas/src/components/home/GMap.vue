@@ -27,8 +27,30 @@ export default {
     }
   },
   mounted() {
-    this.renderMap()
-    console.log(firebase.auth().currentUser)
+    // navigator.geolocationでuserのgeolocationにaccess
+    if (navigator.geolocation) {
+      // getCurrentPosition(successCallback, errorCallback, optionObject)
+      // successCallbackの第一引数で緯度、経度等にaccessできる
+      navigator.geolocation.getCurrentPosition(
+        // 成功時のcallback
+        pos => {
+          this.lat = pos.coords.latitude
+          this.lng = pos.coords.longitude
+          this.renderMap(this.lat, this.lng)
+        },
+        // 失敗時のcallback
+        error => {
+          console.log(err)
+          this.renderMap()
+        },
+        // optionをobjectで指定
+        // maximumAgeでキャッシュを保持するmilliseconds, timeoutでタイムアウトのmilliseconds
+        { maximumAge: 60000, timeout: 3000 }
+      )
+    } else {
+      // userのgeolocationにaccessできない時は、defaultのlat, lng使用
+      this.renderMap()
+    }
   }
 }
 </script>

@@ -6,6 +6,7 @@
 
 <script>
 import firebase from 'firebase'
+import db from '@/firebase/init'
 
 export default {
   name: 'GMap',
@@ -27,6 +28,8 @@ export default {
     }
   },
   mounted() {
+    // 現user取得
+    let user = firebase.auth().currentUser
     // navigator.geolocationでuserのgeolocationにaccess
     if (navigator.geolocation) {
       // getCurrentPosition(successCallback, errorCallback, optionObject)
@@ -36,6 +39,30 @@ export default {
         pos => {
           this.lat = pos.coords.latitude
           this.lng = pos.coords.longitude
+          // firestoreのusers collectionにuserの緯度経度を追加
+          db.collection('users')
+            .where('user_id', '==', user.uid)
+            .get()
+            .then(snapshot => {
+              snapshot.forEach(doc => {
+                db.collection('users')
+                  .doc(doc.id)
+                  .update({
+                    geolocation: {
+                      lat: pos.coords.latitude,
+                      lng: pos.coords.longitude
+                    }
+                  })
+                // 下記は作動しない
+                // doc.update({
+                //   geolocation: {
+                //     lat: pos.coords.latitude,
+                //     lng: pos.coords.longitude
+                //   }
+                // })
+              })
+            })
+
           this.renderMap(this.lat, this.lng)
         },
         // 失敗時のcallback

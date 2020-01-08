@@ -48,19 +48,30 @@ export default {
           remove: /[$*_+~.()'"!\-:@]/g,
           lower: true
         })
-        console.log(this.slug)
+        // console.log(this.slug)
         // firestoreのusers collectionからslugを使ってdocument取得
         let ref = db.collection('users').doc(this.slug)
         ref.get().then(doc => {
           // aliasが既に存在している
           if (doc.exists) {
             this.feedback = 'This alias already exists'
-            // aliasが存在していない
+            // aliasが存在していない、user作成
           } else {
             // emailとpasswordでuser作成、validation後promiseが返ってくる
             firebase
               .auth()
               .createUserWithEmailAndPassword(this.email, this.password)
+              .then(cred => {
+                // aliasで取得したusers collectionのdocに作成した新規userのuidをset
+                ref.set({
+                  alias: this.alias,
+                  geolocation: null,
+                  user_id: cred.user.uid
+                })
+              })
+              .then(() => {
+                this.$router.push({ name: 'GMap' })
+              })
               .catch(err => {
                 console.log(err)
                 // error内容をfeedbackに格納

@@ -14,6 +14,7 @@
         <label for="alias">Alias:</label>
         <input type="text" name="alias" v-model="alias" />
       </div>
+      <p class="red-text center" v-if="feedback">{{ feedback }}</p>
       <div class="field center">
         <button class="btn deep-purple">Signup</button>
       </div>
@@ -22,17 +23,46 @@
 </template>
 
 <script>
+import slugify from 'slugify'
+import db from '@/firebase/init'
+
 export default {
   name: 'Signup',
   data() {
     return {
       email: null,
       password: null,
-      alias: null
+      alias: null,
+      feedback: null,
+      slug: null
     }
   },
   methods: {
-    signup() {}
+    signup() {
+      // aliasが入力されていれば
+      if (this.alias) {
+        this.slug = slugify(this.alias, {
+          replacement: '-',
+          remove: /[$*_+~.()'"!\-:@]/g,
+          lower: true
+        })
+        console.log(this.slug)
+        // firestoreのusers collectionからslugを使ってdocument取得
+        let ref = db.collection('users').doc(this.slug)
+        ref.get().then(doc => {
+          // aliasが既に存在している
+          if (doc.exists) {
+            this.feedback = 'This alias already exists'
+            // aliasが存在していない
+          } else {
+            this.feedback = 'This alias is free to use'
+          }
+        })
+        // alias未入力
+      } else {
+        this.feedback = 'Please enter an alias'
+      }
+    }
   }
 }
 </script>

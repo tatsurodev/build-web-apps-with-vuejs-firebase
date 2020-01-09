@@ -27,6 +27,7 @@ import slugify from 'slugify'
 import db from '@/firebase/init'
 // firebase.authの認証用にimport
 import firebase from 'firebase'
+import functions from 'firebase/functions'
 
 export default {
   name: 'Signup',
@@ -49,11 +50,12 @@ export default {
           lower: true
         })
         // console.log(this.slug)
-        // firestoreのusers collectionからslugを使ってdocument取得
-        let ref = db.collection('users').doc(this.slug)
-        ref.get().then(doc => {
+        // firebase functionでcheckAlias functionをserver sideで実行し、結果を取得
+        let checkAlias = firebase.functions().httpsCallable('checkAlias')
+        checkAlias({ slug: this.slug }).then(result => {
+          console.log(result)
           // aliasが既に存在している
-          if (doc.exists) {
+          if (!result.data.unique) {
             this.feedback = 'This alias already exists'
             // aliasが存在していない、user作成
           } else {
@@ -63,11 +65,13 @@ export default {
               .createUserWithEmailAndPassword(this.email, this.password)
               .then(cred => {
                 // aliasで取得したusers collectionのdocに作成した新規userのuidをset
-                ref.set({
-                  alias: this.alias,
-                  geolocation: null,
-                  user_id: cred.user.uid
-                })
+                db.collection('users')
+                  .doc(this.slug)
+                  .set({
+                    alias: this.alias,
+                    geolocation: null,
+                    user_id: cred.user.uid
+                  })
               })
               .then(() => {
                 this.$router.push({ name: 'GMap' })

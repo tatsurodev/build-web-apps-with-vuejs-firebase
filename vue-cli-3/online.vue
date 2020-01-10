@@ -13,9 +13,17 @@
 
 <script>
 export default {
-  data() {
-    return {
-      online: true
+  // vue componentとして使用する際に使用したdata propertyは、web componentではpropsとして外から受け取る
+  props: ['status'],
+  //   data() {
+  //     return {
+  //       online: true
+  //     }
+  //   }
+  // propsとして受け取ったものをcomputedでdata property名と同じにするとtemplateはそのままにできる
+  computed: {
+    online() {
+      return this.status == 'online'
     }
   }
 }
